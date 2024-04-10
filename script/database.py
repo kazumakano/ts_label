@@ -95,7 +95,7 @@ class DbHandler:
         return "Completed", 200
 
     @app.route("/label", methods=["PUT"])
-    def post_label() -> tuple[str, int]:
+    def put_label() -> tuple[str, int]:
         for d in flask.request.get_json():
             _db.get_or_404(Fig, d["seq"]).label = d["label"]
             _db.session.commit()
