@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>TS Label</title>
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet" />
+  </head>
+
+  <body>
+    <div id="container">
+      <header>
+        <h1>TS Label</h1>
+      </header>
+
+      <main>
+        <span>camera {{ cam_name }} video {{ vid_idx }}</span>
+        <form id="form">
+          {% for t in tss %}
+            <div class="ts-group">
+              <span>frame {{ t["frm_idx"] }}</span>
+              <table class="figs-table">
+                <tbody>
+                  <tr>
+                    {% for f in t["figs"] %}
+                      <td>
+                        <img src="data:image/jpeg;base64,{{ f['img'] }}" />
+                      </td>
+                    {% endfor %}
+                  </tr>
+                  <tr>
+                    {% for f in t["figs"] %}
+                      <td>
+                        <input max="9" min="0" name="{{ f['seq'] }}" type="number" value="{{ f['recog'] }}" />
+                      </td>
+                    {% endfor %}
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          {% endfor %}
+
+          <div id="btn-group">
+            <button id="annot-btn">annot</button>
+          </div>
+        </form>
+      </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+  </body>
+</html>

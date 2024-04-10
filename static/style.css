@@ -1,0 +1,50 @@
+body {
+  display: flex;
+  font-size: large;
+  justify-content: center;
+}
+
+#container {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  max-width: 1024px;
+  width: 80%;
+}
+
+main {
+  width: 100%;
+}
+
+main span {
+  text-transform: capitalize;
+}
+
+.ts-group {
+  margin-bottom: 32px;
+  margin-top: 32px;
+}
+
+.figs-table {
+  text-align: center;
+  width: 100%;
+}
+
+.figs-table > tbody > tr > td > img {
+  width: 100%;
+}
+
+.figs-table > tbody > tr > td > input {
+  font-size: large;
+  min-width: 50%
+}
+
+#btn-group {
+  display: flex;
+  justify-content: center;
+}
+
+#btn-group > button {
+  font-size: large;
+  text-transform: capitalize;
+}

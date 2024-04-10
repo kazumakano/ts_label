@@ -1,0 +1,13 @@
+{
+  "name": "ts-label-cli",
+  "version": "1.0.0",
+  "main": "static/script.js",
+  "repository": "https://github.com/kazumakano/ts_label.git",
+  "author": "kazumakano",
+  "devDependencies": {
+    "typescript": "^5.4.4"
+  },
+  "scripts": {
+    "build": "tsc"
+  }
+}

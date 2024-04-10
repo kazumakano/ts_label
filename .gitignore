@@ -1,0 +1,3 @@
+node_modules/
+script/__pycache__/
+static/script.js
