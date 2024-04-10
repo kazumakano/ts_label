@@ -1,0 +1,12 @@
+Flask
+Flask-SQLAlchemy
+matplotlib
+numpy
+opencv-python
+pandas
+Pillow
+PyYAML
+scipy
+torch
+torchvision
+tqdm
