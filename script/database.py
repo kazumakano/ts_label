@@ -89,11 +89,11 @@ class DbHandler:
                 return flask.redirect(flask.url_for("get_by_seq", seq=s.seq))
 
     @app.route("/<seq>")
-    def get_by_seq(seq: int) -> tuple[str, int]:
+    def get_by_seq(seq: str) -> tuple[str, int]:
         slice = _db.get_or_404(Slice, seq)
         return flask.render_template(
             "index.html",
-            seq=seq,
+            seq=slice.seq,
             cam_name=slice.cam_name,
             vid_idx=slice.vid_idx,
             tss=[{"frm_idx": t.frm_idx, "figs": [{"seq": f.seq, "img": f.img.decode(), "recog": f.recog, "label": f.label} for f in t.figs]} for t in slice.tss],
@@ -109,4 +109,4 @@ class DbHandler:
 
     @classmethod
     def serve(cls, host: str, port: int) -> None:
-        cls.app.run(host=host, port=port, debug=True)
+        cls.app.run(host=host, port=port)
