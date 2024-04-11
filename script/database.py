@@ -35,7 +35,7 @@ class Ts(_db.Model):
     figs      = _db.relationship("Fig", backref="ts")
 
 class DbHandler:
-    app = flask.Flask(__name__, static_folder=path.join(path.dirname(__file__), "../out"), template_folder=path.join(path.dirname(__file__), "../templates"))
+    app = flask.Flask(__name__, static_folder=path.join(path.dirname(__file__), "../static"), template_folder=path.join(path.dirname(__file__), "../templates"))
 
     def __new__(cls, result_dir: str, vid_dir: str, ver: int = 0) -> None:
         cls.app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + path.join(result_dir, "label.db")
@@ -83,16 +83,21 @@ class DbHandler:
         return super().__new__(cls)
 
     @app.route("/")
-    def get() -> tuple[str, int]:
+    def get() -> flask.Response:
         for s in _db.session.query(Slice):
             if s.tss[0].figs[0].label is None:
-                return flask.render_template(
-                    "index.html",
-                    cam_name=s.cam_name,
-                    vid_idx=s.vid_idx,
-                    tss=[{"frm_idx": t.frm_idx, "figs": [{"seq": f.seq, "img": f.img.decode(), "recog": f.recog} for f in t.figs]} for t in s.tss]
-                ), 200
-        return "Completed", 200
+                return flask.redirect(flask.url_for("get_by_seq", seq=s.seq))
+
+    @app.route("/<seq>")
+    def get_by_seq(seq: int) -> tuple[str, int]:
+        slice = _db.get_or_404(Slice, seq)
+        return flask.render_template(
+            "index.html",
+            cam_name=slice.cam_name,
+            vid_idx=slice.vid_idx,
+            tss=[{"frm_idx": t.frm_idx, "figs": [{"seq": f.seq, "img": f.img.decode(), "recog": f.recog, "label": f.label} for f in t.figs]} for t in slice.tss],
+            num=_db.session.query(Slice).count()
+        ), 200
 
     @app.route("/label", methods=["PUT"])
     def put_label() -> tuple[str, int]:

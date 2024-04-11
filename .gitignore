@@ -1,3 +1,4 @@
 node_modules/
-out/
 script/__pycache__/
+static/script.js
+static/style.css

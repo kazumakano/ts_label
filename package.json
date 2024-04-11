@@ -1,14 +1,15 @@
 {
   "name": "ts-label-cli",
   "version": "1.0.0",
-  "main": "static/script.js",
+  "main": "index.js",
   "repository": "https://github.com/kazumakano/ts_label.git",
   "author": "kazumakano",
+  "license": "UNLICENSED",
   "devDependencies": {
     "tailwindcss": "^3.4.3",
     "typescript": "^5.4.4"
   },
   "scripts": {
-    "build": "tailwindcss --input static/style.css --output out/style.css && tsc --outDir out/"
+    "build": "tailwindcss --output static/style.css && tsc"
   }
 }
