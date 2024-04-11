@@ -87,6 +87,7 @@ class DbHandler:
         for s in _db.session.query(Slice):
             if s.tss[0].figs[0].label is None:
                 return flask.redirect(flask.url_for("get_by_seq", seq=s.seq))
+        return "Labeling Completed", 200
 
     @app.route("/<seq>")
     def get_by_seq(seq: str) -> tuple[str, int]:
