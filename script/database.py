@@ -35,7 +35,7 @@ class Ts(_db.Model):
     figs      = _db.relationship("Fig", backref="ts")
 
 class DbHandler:
-    app = flask.Flask(__name__, static_folder=path.join(path.dirname(__file__), "../static"), template_folder=path.join(path.dirname(__file__), "../templates"))
+    app = flask.Flask(__name__, static_folder=path.join(path.dirname(__file__), "../out"), template_folder=path.join(path.dirname(__file__), "../templates"))
 
     def __new__(cls, result_dir: str, vid_dir: str, ver: int = 0) -> None:
         cls.app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + path.join(result_dir, "label.db")

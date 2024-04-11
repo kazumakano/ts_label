@@ -5,9 +5,10 @@
   "repository": "https://github.com/kazumakano/ts_label.git",
   "author": "kazumakano",
   "devDependencies": {
+    "tailwindcss": "^3.4.3",
     "typescript": "^5.4.4"
   },
   "scripts": {
-    "build": "tsc"
+    "build": "tailwindcss --input static/style.css --output out/style.css && tsc --outDir out/"
   }
 }
