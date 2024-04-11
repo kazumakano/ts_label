@@ -93,6 +93,7 @@ class DbHandler:
         slice = _db.get_or_404(Slice, seq)
         return flask.render_template(
             "index.html",
+            seq=seq,
             cam_name=slice.cam_name,
             vid_idx=slice.vid_idx,
             tss=[{"frm_idx": t.frm_idx, "figs": [{"seq": f.seq, "img": f.img.decode(), "recog": f.recog, "label": f.label} for f in t.figs]} for t in slice.tss],
