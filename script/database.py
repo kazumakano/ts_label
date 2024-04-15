@@ -2,9 +2,12 @@ import base64
 import io
 import os.path as path
 from glob import glob, iglob
+from os import mkdir
+from typing import Self
 import cv2
 import flask
 import pandas as pd
+import waitress
 from flask_sqlalchemy import SQLAlchemy
 from PIL import Image
 from tqdm import tqdm
@@ -37,16 +40,18 @@ class Ts(_db.Model):
 class DbHandler:
     app = flask.Flask(__name__, static_folder=path.join(path.dirname(__file__), "../static"), template_folder=path.join(path.dirname(__file__), "../templates"))
 
-    def __new__(cls, result_dir: str, vid_dir: str, ver: int = 0) -> None:
-        cls.app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + path.join(result_dir, "label.db")
+    def __new__(cls, src_result_dir: str, src_vid_dir: str, tgt_dir: str, src_result_ver: int = 0) -> Self:
+        cls.date, cls.tgt_dir = rec_util.read_date(src_result_dir), tgt_dir
+
+        cls.app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + path.join(src_result_dir, "label.db")
         _db.init_app(cls.app)
         with cls.app.app_context():
             _db.create_all()
 
             if _db.session.query(Ts).count() == 0:
-                for f in tqdm(sorted(iglob(path.join(result_dir, f"*/??-??-??_*/version_{ver}/predict_results.csv"))), desc="creating database"):
+                for f in tqdm(sorted(iglob(path.join(src_result_dir, f"*/??-??-??_*/version_{src_result_ver}/predict_results.csv"))), desc="creating database"):
                     df = pd.read_csv(f, usecols=("cam", "vid_idx", "frm_idx", "recog", "is_inconsis"))
-                    vid_files = glob(path.join(vid_dir, f"camera{df.loc[0, 'cam']}/video_??-??-??_{df.loc[0, 'vid_idx']:02d}.mp4"))
+                    vid_files = glob(path.join(src_vid_dir, f"camera{df.loc[0, 'cam']}/video_??-??-??_{df.loc[0, 'vid_idx']:02d}.mp4"))
                     if len(vid_files) != 1:
                         raise Exception("video index must be unique")
                     cap = cv2.VideoCapture(filename=vid_files[0])
@@ -82,12 +87,25 @@ class DbHandler:
 
         return super().__new__(cls)
 
+    @app.route("/dataset")
+    def export_dataset() -> tuple[str, int]:
+        if not path.exists(DbHandler.tgt_dir):
+            mkdir(DbHandler.tgt_dir)
+
+        for f in _db.session.query(Fig):
+            if f.label not in (None, -1, f.recog):
+                ts = _db.session.get_one(Ts, f.ts_seq)
+                slice = _db.session.get_one(Slice, ts.slice_seq)
+                Image.open(io.BytesIO(initial_bytes=base64.b64decode(f.img))).save(path.join(DbHandler.tgt_dir, f"{DbHandler.date.isoformat()}_{slice.cam_name}_{slice.vid_idx:02d}_{ts.frm_idx:04d}_{f.digit}_{f.label}.tif"), format="TIFF")
+
+        return "No Content", 204
+
     @app.route("/")
-    def get() -> flask.Response:
+    def get() -> flask.Response | tuple[str, int]:
         for s in _db.session.query(Slice):
             if s.tss[0].figs[0].label is None:
                 return flask.redirect(flask.url_for("get_by_seq", seq=s.seq))
-        return "Labeling Completed", 200
+        return flask.render_template("completed.html"), 200
 
     @app.route("/<seq>")
     def get_by_seq(seq: str) -> tuple[str, int]:
@@ -101,7 +119,7 @@ class DbHandler:
             num=_db.session.query(Slice).count()
         ), 200
 
-    @app.route("/label", methods=["PUT"])
+    @app.route("/label", methods=["PATCH"])
     def put_label() -> tuple[str, int]:
         for d in flask.request.get_json():
             _db.get_or_404(Fig, d["seq"]).label = d["label"]
@@ -110,4 +128,4 @@ class DbHandler:
 
     @classmethod
     def serve(cls, host: str, port: int) -> None:
-        cls.app.run(host=host, port=port)
+        waitress.serve(cls.app, host=host, port=port)

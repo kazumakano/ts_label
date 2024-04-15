@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content="initial-scale=1,width=device-width" name="viewport">
+    <title>TS Label</title>
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet" />
+  </head>
+
+  <body class="flex justify-center">
+    <div class="container flex flex-col items-center max-w-4xl mb-8 mt-8">
+      <header class="mb-2">
+        <h1 class="font-bold text-6xl">TS Label</h1>
+      </header>
+
+      <main class="mt-2 w-full">
+        {% block main %}{% endblock %}
+      </main>
+    </div>
+
+    <script crossorigin="anonymous" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+  </body>
+</html>

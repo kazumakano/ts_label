@@ -1,122 +1,108 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta content="initial-scale=1,width=device-width" name="viewport">
-    <title>TS Label</title>
-    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet" />
-  </head>
+{% extends "layout.html" %}
 
-  <body class="flex justify-center">
-    <div class="container flex flex-col items-center max-w-4xl mb-8 mt-8">
-      <header class="mb-2">
-        <h1 class="font-bold text-6xl">TS Label</h1>
-      </header>
+{% block main %}
+  <span class="capitalize pl-2 text-2xl">camera {{ cam_name }} / video {{ vid_idx }}</span>
 
-      <main class="mt-2 w-full">
-        <span class="capitalize pl-2 text-2xl">camera {{ cam_name }} / video {{ vid_idx }}</span>
+  <form id="form">
+    {% for t in tss %}
+      <div class="mb-4 mt-4">
+        <span class="capitalize pl-2 text-2xl">frame {{ t["frm_idx"] }}</span>
+        <table class="border-separate border-spacing-x-2 border-spacing-y-4 w-full">
+          <tbody>
+            <tr>
+              {% for f in t["figs"] %}
+                <td>
+                  <img class="w-full" src="data:image/jpeg;base64,{{ f['img'] }}" />
+                </td>
+              {% endfor %}
+            </tr>
+            <tr>
+              {% for f in t["figs"] %}
+                <td>
+                  <div class="flex items-center justify-center">
+                    <input class="form-control text-xl w-1/2" max="9" min="-1" name="{{ f['seq'] }}" type="number" value="{{ f['recog'] }}" />
+                    {% if f["label"] is not none %}
+                      <span class="ml-4 {% if f['label'] is not none and f['label'] != f['recog'] %} text-bg-warning {% endif %} text-xl">{{ f["label"] }}</span>
+                    {% endif %}
+                  </div>
+                </td>
+              {% endfor %}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    {% endfor %}
+  </form>
 
-        <form id="form">
-          {% for t in tss %}
-            <div class="mb-4 mt-4">
-              <span class="capitalize pl-2 text-2xl">frame {{ t["frm_idx"] }}</span>
-              <table class="border-separate border-spacing-x-2 border-spacing-y-4 w-full">
-                <tbody>
-                  <tr>
-                    {% for f in t["figs"] %}
-                      <td>
-                        <img class="w-full" src="data:image/jpeg;base64,{{ f['img'] }}" />
-                      </td>
-                    {% endfor %}
-                  </tr>
-                  <tr>
-                    {% for f in t["figs"] %}
-                      <td>
-                        <div class="flex items-center justify-center">
-                          <input class="form-control text-xl w-1/2" max="9" min="-1" name="{{ f['seq'] }}" type="number" value="{{ f['recog'] }}" />
-                          {% if f["label"] is not none %}
-                            <span class="ml-4 {% if f['label'] is not none and f['label'] != f['recog'] %} text-bg-warning {% endif %} text-xl">{{ f["label"] }}</span>
-                          {% endif %}
-                        </div>
-                      </td>
-                    {% endfor %}
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+  <div class="flex justify-center mb-4">
+    <nav class="mr-2">
+      <ul class="pagination">
+        <li class="{% if seq == 1 %} disabled {% endif %} page-item">
+          <a class="page-link" href="{{ url_for('get_by_seq', seq=seq - 1) }}">
+            <svg fill="{% if seq == 1 %} var(--bs-pagination-disabled-color) {% else %} var(--bs-pagination-color) {% endif %}" height="24px" viewBox="-2 -2 28 28" width="24px">
+              <path d="M0 0h24v24H0V0z" fill="none" />
+              <path d="M15.61 7.41L14.2 6l-6 6 6 6 1.41-1.41L11.03 12l4.58-4.59z" />
+            </svg>
+          </a>
+        </li>
+        {% if num < 8 %}
+          {% for i in num %}
+            <li class="{% if i == seq %} active {% endif %} page-item">
+              <a class="page-link" href="{{ url_for('get_by_seq', seq=i) }}">{{ i }}</a>
+            </li>
           {% endfor %}
-        </form>
-
-        <div class="flex justify-center">
-          <button class="btn btn-primary mr-2 uppercase" id="annot-btn">set label</button>
-          <nav class="ml-2">
-            <ul class="pagination">
-              <li class="{% if seq == 1 %} disabled {% endif %} page-item">
-                <a class="page-link" href="{{ url_for('get_by_seq', seq=seq - 1) }}">
-                  <svg fill="{% if seq == 1 %} var(--bs-pagination-disabled-color) {% else %} var(--bs-pagination-color) {% endif %}" height="24px" viewBox="-2 -2 28 28" width="24px">
-                    <path d="M0 0h24v24H0V0z" fill="none" />
-                    <path d="M15.61 7.41L14.2 6l-6 6 6 6 1.41-1.41L11.03 12l4.58-4.59z" />
-                  </svg>
-                </a>
-              </li>
-              {% if num < 8 %}
-                {% for i in num %}
-                  <li class="{% if i == seq %} active {% endif %} page-item">
-                    <a class="page-link" href="{{ url_for('get_by_seq', seq=i) }}">{{ i }}</a>
-                  </li>
-                {% endfor %}
-              {% else %}
-                <li class="{% if seq == 1 %} active {% endif %} page-item">
-                  <a class="page-link" href="{{ url_for('get_by_seq', seq=1) }}">1</a>
-                </li>
-                <li class="{% if seq == 2 %} active {% elif seq > 4 %} disabled {% endif %} page-item">
-                  <a class="page-link" href="{{ url_for('get_by_seq', seq=2) }}">
-                    {% if seq < 5 %} 2 {% else %}
-                      <svg fill="var(--bs-pagination-disabled-color)" height="24px" viewBox="-2 -2 28 28" width="24px">
-                        <path d="M0 0h24v24H0V0z" fill="none" />
-                        <path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
-                      </svg>
-                    {% endif %}
-                  </a>
-                </li>
-                <li class="{% if seq == 3 %} active {% endif %} page-item">
-                  <a class="page-link" href="{{ url_for('get_by_seq', seq=3 if seq < 5 else num - 4 if seq > num - 4 else seq - 1) }}">{{ 3 if seq < 5 else num - 4 if seq > num - 4 else seq - 1 }}</a>
-                </li>
-                <li class="{% if seq > 3 and seq < num - 2 %} active {% endif %} page-item">
-                  <a class="page-link" href="{{ url_for('get_by_seq', seq=4 if seq < 5 else num - 3 if seq > num - 4 else seq) }}">{{ 4 if seq < 5 else num - 3 if seq > num - 4 else seq }}</a>
-                </li>
-                <li class="{% if seq == num - 2 %} active {% endif %} page-item">
-                  <a class="page-link" href="{{ url_for('get_by_seq', seq=5 if seq < 5 else num - 2 if seq > num - 4 else seq + 1) }}">{{ 5 if seq < 5 else num - 2 if seq > num - 4 else seq + 1 }}</a>
-                </li>
-                <li class="{% if seq == num - 1 %} active {% elif seq < num - 3 %} disabled {% endif %} page-item">
-                  <a class="page-link" href="{{ url_for('get_by_seq', seq=num - 1) }}">
-                    {% if seq > num - 4 %} {{ num - 1 }} {% else %}
-                      <svg fill="var(--bs-pagination-disabled-color)" height="24px" viewBox="-2 -2 28 28" width="24px">
-                        <path d="M0 0h24v24H0V0z" fill="none" />
-                        <path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
-                      </svg>
-                    {% endif %}
-                  </a>
-                </li>
-                <li class="{% if seq == num %} active {% endif %} page-item">
-                  <a class="page-link" href="{{ url_for('get_by_seq', seq=num) }}">{{ num }}</a>
-                </li>
+        {% else %}
+          <li class="{% if seq == 1 %} active {% endif %} page-item">
+            <a class="page-link" href="{{ url_for('get_by_seq', seq=1) }}">1</a>
+          </li>
+          <li class="{% if seq == 2 %} active {% elif seq > 4 %} disabled {% endif %} page-item">
+            <a class="page-link" href="{{ url_for('get_by_seq', seq=2) }}">
+              {% if seq < 5 %} 2 {% else %}
+                <svg fill="var(--bs-pagination-disabled-color)" height="24px" viewBox="-2 -2 28 28" width="24px">
+                  <path d="M0 0h24v24H0V0z" fill="none" />
+                  <path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+                </svg>
               {% endif %}
-              <li class="{% if seq == num %} disabled {% endif %} page-item">
-                <a class="page-link" href="{{ url_for('get_by_seq', seq=seq + 1) }}">
-                  <svg fill="{% if seq == num %} var(--bs-pagination-disabled-color) {% else %} var(--bs-pagination-color) {% endif %}" height="24px" viewBox="-2 -2 28 28" width="24px">
-                    <path d="M0 0h24v24H0V0z" fill="none" />
-                    <path d="M10.02 6L8.61 7.41 13.19 12l-4.58 4.59L10.02 18l6-6-6-6z" />
-                  </svg>
-                </a>
-              </li>
-            </ul>
-          </nav>
-        </div>
-      </main>
-    </div>
+            </a>
+          </li>
+          <li class="{% if seq == 3 %} active {% endif %} page-item">
+            <a class="page-link" href="{{ url_for('get_by_seq', seq=3 if seq < 5 else num - 4 if seq > num - 4 else seq - 1) }}">{{ 3 if seq < 5 else num - 4 if seq > num - 4 else seq - 1 }}</a>
+          </li>
+          <li class="{% if seq > 3 and seq < num - 2 %} active {% endif %} page-item">
+            <a class="page-link" href="{{ url_for('get_by_seq', seq=4 if seq < 5 else num - 3 if seq > num - 4 else seq) }}">{{ 4 if seq < 5 else num - 3 if seq > num - 4 else seq }}</a>
+          </li>
+          <li class="{% if seq == num - 2 %} active {% endif %} page-item">
+            <a class="page-link" href="{{ url_for('get_by_seq', seq=5 if seq < 5 else num - 2 if seq > num - 4 else seq + 1) }}">{{ 5 if seq < 5 else num - 2 if seq > num - 4 else seq + 1 }}</a>
+          </li>
+          <li class="{% if seq == num - 1 %} active {% elif seq < num - 3 %} disabled {% endif %} page-item">
+            <a class="page-link" href="{{ url_for('get_by_seq', seq=num - 1) }}">
+              {% if seq > num - 4 %} {{ num - 1 }} {% else %}
+                <svg fill="var(--bs-pagination-disabled-color)" height="24px" viewBox="-2 -2 28 28" width="24px">
+                  <path d="M0 0h24v24H0V0z" fill="none" />
+                  <path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+                </svg>
+              {% endif %}
+            </a>
+          </li>
+          <li class="{% if seq == num %} active {% endif %} page-item">
+            <a class="page-link" href="{{ url_for('get_by_seq', seq=num) }}">{{ num }}</a>
+          </li>
+        {% endif %}
+        <li class="{% if seq == num %} disabled {% endif %} page-item">
+          <a class="page-link" href="{{ url_for('get_by_seq', seq=seq + 1) }}">
+            <svg fill="{% if seq == num %} var(--bs-pagination-disabled-color) {% else %} var(--bs-pagination-color) {% endif %}" height="24px" viewBox="-2 -2 28 28" width="24px">
+              <path d="M0 0h24v24H0V0z" fill="none" />
+              <path d="M10.02 6L8.61 7.41 13.19 12l-4.58 4.59L10.02 18l6-6-6-6z" />
+            </svg>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    <button class="btn btn-primary ml-2 uppercase" id="annot-btn">set label</button>
+  </div>
 
-    <script crossorigin="anonymous" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-  </body>
-</html>
+  <div class="flex justify-center mt-4">
+    <button class="btn btn-light mr-2 uppercase" id="scan-btn">scan</button>
+    <button class="btn btn-light ml-2 uppercase" id="export-btn">export</button>
+  </div>
+{% endblock %}
