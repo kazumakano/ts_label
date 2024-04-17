@@ -1,6 +1,12 @@
 "use strict";
 var _a, _b, _c;
-(_a = document.getElementById("annot-btn")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", () => {
+(_a = document.getElementById("export-btn")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", () => {
+    fetch("/dataset").then(res => {
+        if (res.ok)
+            alert("Exported");
+    });
+});
+(_b = document.getElementById("label-btn")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", () => {
     const form = document.getElementById("form");
     if (form) {
         const data = [];
@@ -12,12 +18,6 @@ var _a, _b, _c;
                 window.location.reload();
         });
     }
-});
-(_b = document.getElementById("export-btn")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", () => {
-    fetch("/dataset").then(res => {
-        if (res.ok)
-            alert("Exported");
-    });
 });
 (_c = document.getElementById("scan-btn")) === null || _c === void 0 ? void 0 : _c.addEventListener("click", () => {
     window.location.href = "/";
