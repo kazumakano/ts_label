@@ -120,11 +120,18 @@ class DbHandler:
         ), 200
 
     @app.route("/label", methods=["PATCH"])
-    def put_label() -> tuple[str, int]:
+    def patch_label() -> tuple[str, int]:
         for d in flask.request.get_json():
             _db.get_or_404(Fig, d["seq"]).label = d["label"]
             _db.session.commit()
         return "No Content", 204
+
+    @classmethod
+    def reset_label(cls) -> None:
+        with cls.app.app_context():
+            for f in _db.session.query(Fig).filter(Fig.label != None):
+                f.label = None
+                _db.session.commit()
 
     @classmethod
     def serve(cls, host: str, port: int) -> None:

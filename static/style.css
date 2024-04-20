@@ -652,6 +652,10 @@ video {
   max-width: 56rem;
 }
 
+.table-fixed {
+  table-layout: fixed;
+}
+
 .border-separate {
   border-collapse: separate;
 }
