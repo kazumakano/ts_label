@@ -49,7 +49,7 @@ class DbHandler:
             _db.create_all()
 
             if _db.session.query(Ts).count() == 0:
-                for f in tqdm(sorted(iglob(path.join(src_result_dir, f"*/??-??-??_*/version_{src_result_ver}/predict_results.csv"))), desc="creating database"):
+                for f in tqdm(sorted(iglob(path.join(path.abspath(src_result_dir), f"*/??-??-??_*/version_{src_result_ver}/predict_results.csv"))), desc="creating database"):
                     df = pd.read_csv(f, usecols=("cam", "vid_idx", "frm_idx", "recog", "is_inconsis"))
                     vid_files = glob(path.join(src_vid_dir, f"camera{df.loc[0, 'cam']}/video_??-??-??_{df.loc[0, 'vid_idx']:02d}.mp4"))
                     if len(vid_files) != 1:
