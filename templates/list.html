@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block main %}
+  {% for c in cams %}
+    <div class="mb-4 mt-4">
+      <span class="capitalize text-2xl">camera {{ c["name"] }}</span>
+      <table class="border-separate border-spacing-4 text-xl">
+        <tbody>
+          {% for v in c["vids"] %}
+            <tr>
+              <td class="capitalize text-nowrap">video {{ v["idx"] }}</td>
+              <td>
+                {% for s in v["slice_seqs"] %}
+                  <a href="/{{ s }}">{{ s }}</a>
+                {% endfor %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endfor %}
+{% endblock %}

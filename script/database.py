@@ -119,6 +119,19 @@ class DbHandler:
             num=_db.session.query(Slice).count()
         ), 200
 
+    @app.route("/list")
+    def get_list() -> tuple[str, int]:
+        return flask.render_template(
+            "list.html",
+            cams=[{
+                "name": n[0],
+                "vids": [{
+                    "idx": i[0],
+                    "slice_seqs": [j[0] for j in _db.session.query(Slice.seq).filter_by(cam_name=n[0], vid_idx=i[0])]
+                } for i in _db.session.query(Slice.vid_idx).filter_by(cam_name=n[0]).distinct()]
+            } for n in _db.session.query(Slice.cam_name).distinct()]
+        ), 200
+
     @app.route("/label", methods=["PATCH"])
     def patch_label() -> tuple[str, int]:
         for d in flask.request.get_json():

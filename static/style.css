@@ -660,6 +660,12 @@ video {
   border-collapse: separate;
 }
 
+.border-spacing-4 {
+  --tw-border-spacing-x: 1rem;
+  --tw-border-spacing-y: 1rem;
+  border-spacing: var(--tw-border-spacing-x) var(--tw-border-spacing-y);
+}
+
 .border-spacing-x-2 {
   --tw-border-spacing-x: 0.5rem;
   border-spacing: var(--tw-border-spacing-x) var(--tw-border-spacing-y);
@@ -680,6 +686,10 @@ video {
 
 .justify-center {
   justify-content: center;
+}
+
+.text-nowrap {
+  text-wrap: nowrap;
 }
 
 .pl-2 {
