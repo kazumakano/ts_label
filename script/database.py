@@ -81,6 +81,7 @@ class DbHandler:
                                 Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB)).save(buf, format="JPEG")
                                 _db.session.add(Fig(ts_seq=ts_seq, digit=i, img=base64.b64encode(buf.getvalue()), recog=int(r["recog"][i + i // 2])))
                                 _db.session.commit()
+                                buf.close()
                             cap_pos += 1
 
                     cap.release()
